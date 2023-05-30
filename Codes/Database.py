@@ -2,6 +2,7 @@ import psycopg2
 import datetime
 import os
 from dotenv import load_dotenv
+import pytz
 
 COST = 4900
 
@@ -62,8 +63,15 @@ class Database:
             raise Exception("No data found")
 
         self.cursor.execute(f"SELECT discount FROM rank WHERE name = '{user[2]}';")
-        discount = self.cursor.fetchone()[0]  # (3,) tuple
-        payment = COST * (1 - discount * 0.01)
+        discount_rank=self.cursor.fetchone()[0]
+        self.cursor.execute(f"""SELECT SUM(discount) FROM achievements 
+        INNER JOIN client_achievements ON achievements.id=client_achievements.achievements_id 
+        WHERE  client_achievements.client_id= {user[0]};""")
+        discount_achievements = self.cursor.fetchone()[0]  # (3,) tuple
+        if discount_achievements is not None:
+            payment = COST * (1 - (discount_achievements+discount_rank) * 0.01)
+        else:
+            payment = COST * (1 - discount_rank * 0.01)
         return user[0], user[1], payment
 
     def getAuthorizationInfo(self, login, password):
@@ -106,3 +114,16 @@ class Database:
                 if lesson[0].month == month + 1 and lesson[0].year == year
             ]
         return result
+
+    def getPurchases(self):
+        self.cursor.execute("""SELECT finish_date,client_id FROM purchases """)
+        purchases=self.cursor.fetchall()
+        purchases_exp_days=[]
+        for finish_date, client_id in purchases:
+            if finish_date>datetime.datetime.utcnow().replace(tzinfo=pytz.UTC):
+                purchases_exp_days.append([client_id,(finish_date-datetime.datetime.utcnow().replace(tzinfo=pytz.UTC)).days])
+        return purchases_exp_days
+
+
+
+

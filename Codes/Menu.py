@@ -10,6 +10,7 @@ class Menu(Window):
         self.form.payments.clicked.connect(self.showPayments)
         self.form.logOutButton.clicked.connect(self.logOut)
         self.form.officeHoursButton.clicked.connect(self.showOfficeHours)
+        self.form.purchasesButton.clicked.connect(self.showPurchases)
 
     def showAttendance(self):
         Window.windows["Attendance"]["window"].show()
@@ -34,3 +35,6 @@ class Menu(Window):
         with open(resource_path("authorizationInfo.txt"), "w") as f:
             f.seek(0)
             f.write("")
+
+    def showPurchases(self):
+        print(self.db.getPurchases())
