@@ -115,14 +115,31 @@ class Database:
             ]
         return result
 
-    def getPurchases(self):
-        self.cursor.execute("""SELECT finish_date,client_id FROM purchases """)
+    def getPurchasesExpDays(self):
+        self.cursor.execute("""SELECT id, finish_date,client_id FROM purchases """)
         purchases=self.cursor.fetchall()
         purchases_exp_days=[]
-        for finish_date, client_id in purchases:
+        for purchase_id, finish_date, client_id in purchases:
             if finish_date>datetime.datetime.utcnow().replace(tzinfo=pytz.UTC):
-                purchases_exp_days.append([client_id,(finish_date-datetime.datetime.utcnow().replace(tzinfo=pytz.UTC)).days])
+                purchases_exp_days.append([purchase_id, client_id,(finish_date-datetime.datetime.utcnow().replace(tzinfo=pytz.UTC)).days])
         return purchases_exp_days
+
+    def getClientUsernameById(self, id):
+        self.cursor.execute(f"""SELECT username FROM client WHERE id={id}""")
+        return self.cursor.fetchone()[0]
+
+    def getExpHours(self,purchases_id):
+        self.cursor.execute(f"""SELECT tariff FROM purchases WHERE id={purchases_id}""")
+        tariff=self.cursor.fetchone()[0]
+        data=tariff.split(" | ")
+        hours=0
+        for i in range(len(data)):
+            self.cursor.execute(f"""SELECT office_hours FROM tariff WHERE name='{data[i]}'""")
+            hours+=self.cursor.fetchone()[0]
+        self.cursor.execute(f"""SELECT COUNT(purchases_id) FROM office_hours WHERE purchases_id={purchases_id}""")
+        return hours-self.cursor.fetchone()[0]
+
+
 
 
 

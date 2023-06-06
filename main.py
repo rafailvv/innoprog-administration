@@ -6,6 +6,7 @@ from Codes.Menu import Menu
 from Codes.OfficeHours import OfficeHours
 from Codes.OfficeHoursStaff import OfficeHoursStaff
 from Codes.Payments import Payments
+from Codes.Purchases import Purchases
 from Codes.path import resource_path
 
 win = QApplication([])
@@ -39,6 +40,7 @@ def createWindows():
     payments = Payments()
     officeHours = OfficeHours()
     officeHoursStaff = OfficeHoursStaff()
+    purchases= Purchases()
     return authorization
 
 

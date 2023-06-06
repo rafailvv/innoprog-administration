@@ -37,4 +37,6 @@ class Menu(Window):
             f.write("")
 
     def showPurchases(self):
-        print(self.db.getPurchases())
+        Window.windows["Purchases"]["window"].show()
+        Window.windows["Purchases"]["object"].fill()
+        self.hide()
