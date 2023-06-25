@@ -238,7 +238,7 @@ border-radius: 10px}</string>
        <bool>false</bool>
       </attribute>
       <attribute name="horizontalHeaderDefaultSectionSize">
-       <number>220</number>
+       <number>200</number>
       </attribute>
       <attribute name="horizontalHeaderHighlightSections">
        <bool>true</bool>
@@ -247,7 +247,7 @@ border-radius: 10px}</string>
        <bool>false</bool>
       </attribute>
       <attribute name="horizontalHeaderStretchLastSection">
-       <bool>false</bool>
+       <bool>true</bool>
       </attribute>
       <attribute name="verticalHeaderVisible">
        <bool>false</bool>
@@ -293,6 +293,16 @@ border-radius: 10px}</string>
        <property name="font">
         <font>
          <family>OCR A Extended</family>
+         <pointsize>13</pointsize>
+        </font>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Referral</string>
+       </property>
+       <property name="font">
+        <font>
          <pointsize>13</pointsize>
         </font>
        </property>
@@ -396,8 +406,6 @@ color: rgb(255, 255, 255);
    </layout>
   </widget>
  </widget>
- <resources>
-  <include location="../logo.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

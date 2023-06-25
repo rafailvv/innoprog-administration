@@ -23,16 +23,18 @@ class Attendance(Window):
         datefrom = self.form.dateFrom.date().startOfDay().toPyDateTime().date()
         dateto = self.form.dateTo.date().startOfDay().toPyDateTime().date()
         result = Window.db.getAttendance(datefrom, dateto)
-        self.form.attendanceTable.setColumnCount(3)
+        self.form.attendanceTable.setColumnCount(4)
         self.form.attendanceTable.setRowCount(len(result))
         for i, elem in enumerate(result):
             id = QTableWidgetItem(str(elem[0]))
             username = QTableWidgetItem(elem[1])
             last_visit = QTableWidgetItem(elem[2].strftime("%d-%m-%y"))
+            name = QTableWidgetItem(elem[3])
             self.form.attendanceTable.setItem(i, 0, id)
             if elem[1] is not None:
                 self.form.attendanceTable.setItem(i, 1, username)
             self.form.attendanceTable.setItem(i, 2, last_visit)
+            self.form.attendanceTable.setItem(i, 3, name)
 
     def calendarFrom(self):
         self.form.dateFrom.setDate(self.form.calendarFrom.selectedDate())

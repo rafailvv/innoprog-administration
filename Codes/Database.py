@@ -23,7 +23,7 @@ class Database:
         return list(map(int, (os.getenv("ADMINIDS").split(', '))))
 
     def getAttendance(self, dateFrom: datetime.date, dateTo: datetime.date):
-        self.cursor.execute("SELECT id, username, last_visit FROM client;")
+        self.cursor.execute("SELECT client.id, client.username, client.last_visit, partner.name FROM client LEFT JOIN partner ON client.referral_id=partner.id;")
         result = self.cursor.fetchall()
         result1 = []
         for i in result:
