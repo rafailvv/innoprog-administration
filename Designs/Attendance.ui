@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>951</width>
-    <height>766</height>
+    <height>768</height>
    </rect>
   </property>
   <property name="font">
@@ -31,7 +31,7 @@
    <string notr="true"/>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_3">
+   <layout class="QVBoxLayout" name="verticalLayout_4">
     <item>
      <widget class="QLabel" name="attendanceLabel">
       <property name="font">
@@ -238,7 +238,7 @@ border-radius: 10px}</string>
        <bool>false</bool>
       </attribute>
       <attribute name="horizontalHeaderDefaultSectionSize">
-       <number>200</number>
+       <number>180</number>
       </attribute>
       <attribute name="horizontalHeaderHighlightSections">
        <bool>true</bool>
@@ -293,6 +293,17 @@ border-radius: 10px}</string>
        <property name="font">
         <font>
          <family>OCR A Extended</family>
+         <pointsize>13</pointsize>
+        </font>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Points</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>MS Shell Dlg 2</family>
          <pointsize>13</pointsize>
         </font>
        </property>
@@ -358,24 +369,26 @@ color: rgb(255, 255, 255);
       </property>
      </widget>
     </item>
-    <item alignment="Qt::AlignLeft">
-     <widget class="QPushButton" name="backToMenu">
-      <property name="minimumSize">
-       <size>
-        <width>150</width>
-        <height>50</height>
-       </size>
-      </property>
-      <property name="font">
-       <font>
-        <family>OCR A Extended</family>
-        <pointsize>12</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QPushButton {
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QPushButton" name="backToMenu">
+        <property name="minimumSize">
+         <size>
+          <width>150</width>
+          <height>50</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <family>OCR A Extended</family>
+          <pointsize>12</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
 background-color:rgb(156, 120, 255);
 border-radius: 15px;
 color: rgb(255, 255, 255);
@@ -397,11 +410,58 @@ color: rgb(255, 255, 255);
 
 
 </string>
-      </property>
-      <property name="text">
-       <string>Back to Menu</string>
-      </property>
-     </widget>
+        </property>
+        <property name="text">
+         <string>Back to Menu</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="attendance_grafph">
+        <property name="minimumSize">
+         <size>
+          <width>150</width>
+          <height>50</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <family>OCR A Extended</family>
+          <pointsize>12</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+background-color:rgb(156, 120, 255);
+border-radius: 15px;
+color: rgb(255, 255, 255);
+
+}
+
+QPushButton:hover {
+background-color:rgb(170, 145, 204);
+border-radius: 15px;
+color: rgb(255, 255, 255);
+
+}
+QPushButton:pressed {
+background-color:rgb(125, 96, 204);
+border-radius: 15px;
+color: rgb(255, 255, 255);
+
+}
+
+
+</string>
+        </property>
+        <property name="text">
+         <string>Grafph</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>

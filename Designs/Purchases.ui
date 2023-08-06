@@ -116,6 +116,16 @@
           <string>remaining office hours</string>
          </property>
         </column>
+        <column>
+         <property name="text">
+          <string>points</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>last visit</string>
+         </property>
+        </column>
        </widget>
       </item>
       <item>
@@ -177,7 +187,7 @@ color: rgb(255, 255, 255);
      <x>0</x>
      <y>0</y>
      <width>909</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

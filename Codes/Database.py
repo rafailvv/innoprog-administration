@@ -141,6 +141,10 @@ class Database:
         self.cursor.execute(f"""SELECT COUNT(purchases_id) FROM office_hours WHERE purchases_id={purchases_id}""")
         return hours-self.cursor.fetchone()[0]
 
+    def getPointsAndLastvisit(self, client_id):
+        self.cursor.execute(f"SELECT points, last_visit FROM client WHERE id='{client_id}'")
+        return self.cursor.fetchone()
+
 
 
 
