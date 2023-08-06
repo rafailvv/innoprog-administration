@@ -135,7 +135,9 @@ class Database:
         hours=0
         for i in range(len(data)):
             self.cursor.execute(f"""SELECT office_hours FROM tariff WHERE name='{data[i]}'""")
-            hours+=self.cursor.fetchone()[0]
+            office_hours = self.cursor.fetchone()
+            if office_hours is not None:
+                hours+=office_hours[0]
         self.cursor.execute(f"""SELECT COUNT(purchases_id) FROM office_hours WHERE purchases_id={purchases_id}""")
         return hours-self.cursor.fetchone()[0]
 
