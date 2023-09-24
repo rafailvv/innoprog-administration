@@ -126,6 +126,11 @@
           <string>last visit</string>
          </property>
         </column>
+        <column>
+         <property name="text">
+          <string>extra hours</string>
+         </property>
+        </column>
        </widget>
       </item>
       <item>

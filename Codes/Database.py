@@ -4,7 +4,7 @@ import os
 from dotenv import load_dotenv
 import pytz
 
-COST = 4900
+COST = 5990
 
 
 class Database:
@@ -23,7 +23,8 @@ class Database:
         return list(map(int, (os.getenv("ADMINIDS").split(', '))))
 
     def getAttendance(self, dateFrom: datetime.date, dateTo: datetime.date):
-        self.cursor.execute("SELECT client.id, client.username, client.last_visit, partner.name, client.points FROM client LEFT JOIN partner ON client.referral_id=partner.id;")
+        self.cursor.execute(
+            "SELECT client.id, client.username, client.last_visit, partner.name, client.points FROM client LEFT JOIN partner ON client.referral_id=partner.id;")
         result = self.cursor.fetchall()
         result1 = []
         for i in result:
@@ -39,9 +40,9 @@ class Database:
             return result
         for user in result:
             if (
-                filter.lower() in str(user[0]).lower()
-                or user[1] is not None
-                and filter.lower() in user[1].lower()
+                    filter.lower() in str(user[0]).lower()
+                    or user[1] is not None
+                    and filter.lower() in user[1].lower()
             ):
                 result1 += [user]
         return result1
@@ -63,13 +64,13 @@ class Database:
             raise Exception("No data found")
 
         self.cursor.execute(f"SELECT discount FROM rank WHERE name = '{user[2]}';")
-        discount_rank=self.cursor.fetchone()[0]
+        discount_rank = self.cursor.fetchone()[0]
         self.cursor.execute(f"""SELECT SUM(discount) FROM achievements 
         INNER JOIN client_achievements ON achievements.id=client_achievements.achievements_id 
         WHERE  client_achievements.client_id= {user[0]};""")
         discount_achievements = self.cursor.fetchone()[0]  # (3,) tuple
         if discount_achievements is not None:
-            payment = COST * (1 - (discount_achievements+discount_rank) * 0.01)
+            payment = COST * (1 - (discount_achievements + discount_rank) * 0.01)
         else:
             payment = COST * (1 - discount_rank * 0.01)
         return user[0], user[1], payment
@@ -117,36 +118,36 @@ class Database:
 
     def getPurchasesExpDays(self):
         self.cursor.execute("""SELECT id, finish_date,client_id FROM purchases """)
-        purchases=self.cursor.fetchall()
-        purchases_exp_days=[]
+        purchases = self.cursor.fetchall()
+        purchases_exp_days = []
         for purchase_id, finish_date, client_id in purchases:
-            if finish_date>datetime.datetime.utcnow().replace(tzinfo=pytz.UTC):
-                purchases_exp_days.append([purchase_id, client_id,(finish_date-datetime.datetime.utcnow().replace(tzinfo=pytz.UTC)).days])
+            if finish_date > datetime.datetime.utcnow().replace(tzinfo=pytz.UTC):
+                purchases_exp_days.append(
+                    [purchase_id, client_id, (finish_date - datetime.datetime.utcnow().replace(tzinfo=pytz.UTC)).days])
         return purchases_exp_days
 
-    def getClientUsernameById(self, id):
-        self.cursor.execute(f"""SELECT username FROM client WHERE id={id}""")
-        return self.cursor.fetchone()[0]
-
-    def getExpHours(self,purchases_id):
+    def getExpHours(self, purchases_id):
         self.cursor.execute(f"""SELECT tariff FROM purchases WHERE id={purchases_id}""")
-        tariff=self.cursor.fetchone()[0]
-        data=tariff.split(" | ")
-        hours=0
+        tariff = self.cursor.fetchone()[0]
+        is_real = True if tariff in [
+            "Подписка PILOT",
+            "Подписка MEDIUM",
+            "Подписка PRO",
+            "Детский"
+        ] else False
+        data = tariff.split(" | ")
+        hours = 0
+        addition_hours = 0
         for i in range(len(data)):
             self.cursor.execute(f"""SELECT office_hours FROM tariff WHERE name='{data[i]}'""")
             office_hours = self.cursor.fetchone()
             if office_hours is not None:
-                hours+=office_hours[0]
+                hours += office_hours[0]
+                if "+" in data[i]:
+                    addition_hours += 1
         self.cursor.execute(f"""SELECT COUNT(purchases_id) FROM office_hours WHERE purchases_id={purchases_id}""")
-        return hours-self.cursor.fetchone()[0]
+        return hours - self.cursor.fetchone()[0], is_real, addition_hours
 
-    def getPointsAndLastvisit(self, client_id):
-        self.cursor.execute(f"SELECT points, last_visit FROM client WHERE id='{client_id}'")
+    def getUsernamePointsLastVisit(self, client_id):
+        self.cursor.execute(f"SELECT username, points, last_visit FROM client WHERE id={client_id}")
         return self.cursor.fetchone()
-
-
-
-
-
-
