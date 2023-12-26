@@ -1,5 +1,6 @@
 import datetime
 
+import pytz
 from PyQt6.QtWidgets import QTableWidgetItem
 
 from Codes.path import resource_path
@@ -43,15 +44,16 @@ class OfficeHoursStaff(Window):
             result = Window.db.getOfficeHoursByTeacher(
                 Window.db.getTeacher(teacherID), month=month, year=year
             )
-
+        moscow_tz = pytz.timezone('Europe/Moscow')
         for i, elem in enumerate(result):
+            moscow_time = elem[0].astimezone(moscow_tz) if elem[0] else None
             if (
-                elem[3] is None
-                and self.form.withoutRecButton.isChecked()
-                or not self.form.withoutRecButton.isChecked()
+                    elem[3] is None
+                    and self.form.withoutRecButton.isChecked()
+                    or not self.form.withoutRecButton.isChecked()
             ):
                 self.form.resultTable.setRowCount(self.form.resultTable.rowCount() + 1)
-                date = QTableWidgetItem(str(elem[0].strftime("%d-%m-%y %H:%M")))
+                date = QTableWidgetItem(moscow_time.strftime("%d-%m-%y %H:%M") if moscow_time else '')
                 self.form.resultTable.setItem(i, 0, date)
                 client_id = QTableWidgetItem(str(elem[1]))
                 self.form.resultTable.setItem(i, 1, client_id)

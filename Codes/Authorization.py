@@ -24,6 +24,10 @@ class Authorization(Window):
             Window.windows["Menu"]["form"].helloMessage.setText(
                 f'Hello, {Authorization.translator.translate(user[2], dest="en").text.replace("Venediktov Rafael Vladimirovich","Venediktov Rafail Vladimirovich")}'
             )
+            if int(user[1]) not in Window.db.getAdmins():
+                Window.windows["Menu"]["form"].purchasesButton.hide()
+            else:
+                Window.windows["Menu"]["form"].purchasesButton.show()
         else:
             dlg = QMessageBox()
             dlg.setWindowTitle("Error")

@@ -100,12 +100,23 @@ class Database:
 
     def getOfficeHoursByTeacher(self, teacher, month=None, year=None):
         self.cursor.execute(
-            f"""SELECT office_hours."time", client.id, client.username, office_hours.recording 
-        FROM office_hours 
-        JOIN teacher ON office_hours.teacher_id = teacher.id 
-        JOIN purchases ON purchases.id = office_hours.purchases_id 
-        JOIN client ON client.id = purchases.client_id 
-        WHERE teacher.name = '{teacher}';"""
+            f"""SELECT 
+    office_hours.time, 
+    COALESCE(p.client_id, office_hours.client_id) as client_id,
+    client.username, 
+    office_hours.recording 
+FROM 
+    office_hours 
+JOIN 
+    teacher ON office_hours.teacher_id = teacher.id 
+LEFT JOIN 
+    (SELECT id, client_id FROM purchases WHERE id IS NOT NULL) p ON office_hours.purchases_id = p.id
+JOIN 
+    client ON client.id = COALESCE(p.client_id, office_hours.client_id)
+WHERE 
+    teacher.name = '{teacher}'
+    ORDER BY office_hours.time DESC;
+"""
         )
         result = self.cursor.fetchall()
         if month is not None or year is not None:
@@ -116,38 +127,29 @@ class Database:
             ]
         return result
 
-    def getPurchasesExpDays(self):
-        self.cursor.execute("""SELECT id, finish_date,client_id FROM purchases """)
-        purchases = self.cursor.fetchall()
-        purchases_exp_days = []
-        for purchase_id, finish_date, client_id in purchases:
-            if finish_date > datetime.datetime.utcnow().replace(tzinfo=pytz.UTC):
-                purchases_exp_days.append(
-                    [purchase_id, client_id, (finish_date - datetime.datetime.utcnow().replace(tzinfo=pytz.UTC)).days])
-        return purchases_exp_days
+    def fetch_all_data(self):
+        query = """
+        SELECT p.id, p.client_id, p.finish_date, p.tariff,
+               c.username, c.points, c.last_visit,
+               t.office_hours, COALESCE(oh.hours_used, 0) as hours_used
+        FROM purchases p
+        JOIN client c ON p.client_id = c.id
+        LEFT JOIN tariff t ON p.tariff = t.name
+        LEFT JOIN (
+            SELECT purchases_id, COUNT(*) as hours_used
+            FROM office_hours
+            GROUP BY purchases_id
+        ) oh ON p.id = oh.purchases_id
+        WHERE p.finish_date > %s
+        ORDER BY c.last_visit DESC
+        """
+        current_time = datetime.datetime.utcnow().replace(tzinfo=pytz.UTC)
+        self.cursor.execute(query, (current_time,))
+        return self.cursor.fetchall()
 
-    def getExpHours(self, purchases_id):
-        self.cursor.execute(f"""SELECT tariff FROM purchases WHERE id={purchases_id}""")
-        tariff = self.cursor.fetchone()[0]
-        is_real = True if tariff in [
-            "Подписка PILOT",
-            "Подписка MEDIUM",
-            "Подписка PRO",
-            "Детский"
-        ] else False
-        data = tariff.split(" | ")
-        hours = 0
-        addition_hours = 0
-        for i in range(len(data)):
-            self.cursor.execute(f"""SELECT office_hours FROM tariff WHERE name='{data[i]}'""")
-            office_hours = self.cursor.fetchone()
-            if office_hours is not None:
-                hours += office_hours[0]
-                if "+" in data[i]:
-                    addition_hours += 1
-        self.cursor.execute(f"""SELECT COUNT(purchases_id) FROM office_hours WHERE purchases_id={purchases_id}""")
-        return hours - self.cursor.fetchone()[0], is_real, addition_hours
+    def get_office_hours(self, purchase_id):
+        self.cursor.execute(f"""SELECT COUNT(purchases_id) FROM office_hours WHERE purchases_id={purchase_id}""")
+        return self.cursor.fetchone()[0]
 
-    def getUsernamePointsLastVisit(self, client_id):
-        self.cursor.execute(f"SELECT username, points, last_visit FROM client WHERE id={client_id}")
-        return self.cursor.fetchone()
+
+
